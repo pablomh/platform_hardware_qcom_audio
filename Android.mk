@@ -12,7 +12,7 @@ include $(MY_LOCAL_PATH)/post_proc/Android.mk
 endif
 
 else
-ifneq ($(filter msm8909 ,$(TARGET_BOARD_PLATFORM)),)
+ifneq ($(filter msm8909 msm8952 ,$(TARGET_BOARD_PLATFORM)),)
 #For msm8909 target
 include $(call all-named-subdir-makefiles,msm8909)
 

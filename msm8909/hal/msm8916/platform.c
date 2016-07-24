@@ -54,6 +54,7 @@
 #define MIXER_XML_PATH_AUXPCM "/system/etc/mixer_paths_auxpcm.xml"
 #define MIXER_XML_PATH_WCD9306 "/system/etc/mixer_paths_wcd9306.xml"
 #define MIXER_XML_PATH_WCD9330 "/system/etc/mixer_paths_wcd9330.xml"
+#define MIXER_XML_PATH_WCD9335 "/system/etc/mixer_paths_wcd9335.xml"
 #define MIXER_XML_PATH_WCD9326 "/system/etc/mixer_paths_wcd9326_i2s.xml"
 #define PLATFORM_INFO_XML_PATH      "/system/etc/audio_platform_info.xml"
 #define LIB_ACDB_LOADER "libacdbloader.so"
@@ -599,7 +600,9 @@ static void update_codec_type(const char *snd_card_name) {
          !strncmp(snd_card_name, "msm8939-tomtom9330-snd-card",
                   sizeof("msm8939-tomtom9330-snd-card")) ||
         !strncmp(snd_card_name, "msm8x09-tasha9326-snd-card",
-                  sizeof("msm8x09-tasha9326-snd-card")))
+                  sizeof("msm8x09-tasha9326-snd-card")) ||
+         !strncmp(snd_card_name, "msm8976-tasha-snd-card",
+                  sizeof("msm8976-tasha-snd-card")))
      {
          ALOGI("%s: snd_card_name: %s",__func__,snd_card_name);
          is_external_codec = true;
@@ -701,6 +704,15 @@ static void query_platform(const char *snd_card_name,
         msm_device_to_be_id = msm_device_to_be_id_external_codec;
         msm_be_id_array_len  =
             sizeof(msm_device_to_be_id_external_codec) / sizeof(msm_device_to_be_id_external_codec[0]);
+
+    } else if (!strncmp(snd_card_name, "msm8976-tasha-snd-card",
+                 sizeof("msm8976-tasha-snd-card"))) {
+        strlcpy(mixer_xml_path, MIXER_XML_PATH_WCD9335,
+                sizeof(MIXER_XML_PATH_WCD9335));
+        msm_device_to_be_id = msm_device_to_be_id_external_codec;
+        msm_be_id_array_len  =
+            sizeof(msm_device_to_be_id_external_codec) / sizeof(msm_device_to_be_id_external_codec[0]);
+
     } else if (!strncmp(snd_card_name, "msm8909-skua-snd-card",
                 sizeof("msm8909-skua-snd-card"))) {
         strlcpy(mixer_xml_path, MIXER_XML_PATH_SKUA,
