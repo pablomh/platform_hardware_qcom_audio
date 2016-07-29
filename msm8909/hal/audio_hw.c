@@ -153,6 +153,8 @@ const char * const use_case_table[AUDIO_USECASE_MAX] = {
     [USECASE_AUDIO_PLAYBACK_OFFLOAD8] = "compress-offload-playback8",
     [USECASE_AUDIO_PLAYBACK_OFFLOAD9] = "compress-offload-playback9",
 #endif
+    [USECASE_AUDIO_PLAYBACK_ULL] = "audio-ull-playback",
+
     [USECASE_AUDIO_RECORD] = "audio-record",
     [USECASE_AUDIO_RECORD_COMPRESS] = "audio-record-compress",
     [USECASE_AUDIO_RECORD_LOW_LATENCY] = "low-latency-record",
@@ -166,6 +168,8 @@ const char * const use_case_table[AUDIO_USECASE_MAX] = {
     [USECASE_VOLTE_CALL] = "volte-call",
     [USECASE_QCHAT_CALL] = "qchat-call",
     [USECASE_VOWLAN_CALL] = "vowlan-call",
+    [USECASE_VOICEMMODE1_CALL] = "voicemmode1-call",
+    [USECASE_VOICEMMODE2_CALL] = "voicemmode2-call",
     [USECASE_COMPRESS_VOIP_CALL] = "compress-voip-call",
     [USECASE_INCALL_REC_UPLINK] = "incall-rec-uplink",
     [USECASE_INCALL_REC_DOWNLINK] = "incall-rec-downlink",
@@ -2789,6 +2793,10 @@ static int adev_open_output_stream(struct audio_hw_device *dev,
         out->usecase = USECASE_AUDIO_PLAYBACK_AFE_PROXY;
         out->config = pcm_config_afe_proxy_playback;
         adev->voice_tx_output = out;
+    } else if (out->flags & AUDIO_OUTPUT_FLAG_RAW) {
+        out->usecase = USECASE_AUDIO_PLAYBACK_ULL;
+        out->config = pcm_config_low_latency;
+        out->sample_rate = out->config.rate;
     } else if (out->flags & AUDIO_OUTPUT_FLAG_FAST) {
         format = AUDIO_FORMAT_PCM_16_BIT;
         out->usecase = USECASE_AUDIO_PLAYBACK_LOW_LATENCY;
