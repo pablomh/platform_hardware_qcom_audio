@@ -178,6 +178,8 @@ const char * const use_case_table[AUDIO_USECASE_MAX] = {
 
     [USECASE_AUDIO_PLAYBACK_AFE_PROXY] = "afe-proxy-playback",
     [USECASE_AUDIO_RECORD_AFE_PROXY] = "afe-proxy-record",
+
+    [USECASE_AUDIO_RECORD_FM_VIRTUAL] = "fm-virtual-record",
 };
 
 
@@ -790,7 +792,19 @@ int start_input_stream(struct stream_in *in)
     struct audio_usecase *uc_info;
     struct audio_device *adev = in->dev;
 
-    ALOGV("%s: enter: usecase(%d)", __func__, in->usecase);
+    int usecase = platform_update_usecase_from_source(in->source,in->usecase);
+    if (get_usecase_from_list(adev, usecase) == NULL)
+        in->usecase = usecase;
+
+    ALOGD("%s: enter: stream(%p)usecase(%d: %s)",
+          __func__, &in->stream, in->usecase, use_case_table[in->usecase]);
+
+    if (get_usecase_from_list(adev, in->usecase) != NULL) {
+        ALOGE("%s: use case assigned already in use, stream(%p)usecase(%d: %s)",
+            __func__, &in->stream, in->usecase, use_case_table[in->usecase]);
+        goto error_config;
+    }
+
     in->pcm_device_id = platform_get_pcm_device_id(in->usecase, PCM_CAPTURE);
     if (in->pcm_device_id < 0) {
         ALOGE("%s: Could not find PCM device id for the usecase(%d)",

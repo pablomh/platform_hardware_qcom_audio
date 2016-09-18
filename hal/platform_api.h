@@ -84,4 +84,5 @@ bool platform_check_backends_match(snd_device_t snd_device1, snd_device_t snd_de
 
 int platform_set_parameters(void *platform, struct str_parms *parms);
 
+int platform_update_usecase_from_source(int source, audio_usecase_t usecase);
 #endif // AUDIO_PLATFORM_API_H

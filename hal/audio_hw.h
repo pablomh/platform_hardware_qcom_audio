@@ -68,7 +68,7 @@ enum {
     /* Capture usecases */
     USECASE_AUDIO_RECORD,
     USECASE_AUDIO_RECORD_LOW_LATENCY,
-
+    USECASE_AUDIO_RECORD_FM_VIRTUAL,
     USECASE_VOICE_CALL,
 
     /* Voice extension usecases */
