@@ -15,7 +15,8 @@
  */
 
 #define LOG_TAG "audio_hw_extn"
-/*#define LOG_NDEBUG 0*/
+#define LOG_NDEBUG 0
+#define LOG_NIDEBUG 0
 #define LOG_NDDEBUG 0
 
 #include <stdlib.h>
@@ -103,6 +104,7 @@ int audio_extn_perf_lock_init(void)
 {
     int ret = 0;
     if (qcopt_handle == NULL) {
+        ALOGD("%s: qcopt_handle == NULL", __func__);
         if (property_get("ro.vendor.extension_library",
                          opt_lib_path, NULL) <= 0) {
             ALOGE("%s: Failed getting perf property", __func__);
@@ -114,6 +116,7 @@ int audio_extn_perf_lock_init(void)
             ret = -EINVAL;
             goto err;
         } else {
+            ALOGD("%s: Success opening perf handle", __func__);
             perf_lock_acq = (perf_lock_acquire_t)dlsym(qcopt_handle,
                                                        "perf_lock_acq");
             if (perf_lock_acq == NULL) {
@@ -121,6 +124,7 @@ int audio_extn_perf_lock_init(void)
                 ret = -EINVAL;
                 goto err;
             }
+            ALOGD("%s: Perf lock Acquire != NULL", __func__);
             perf_lock_rel = (perf_lock_release_t)dlsym(qcopt_handle,
                                                        "perf_lock_rel");
             if (perf_lock_rel == NULL) {
@@ -131,6 +135,7 @@ int audio_extn_perf_lock_init(void)
             ALOGD("%s: Perf lock handles Success", __func__);
         }
     }
+    ALOGD("Exiting %s", __func__);
 err:
     return ret;
 }
