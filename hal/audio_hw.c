@@ -16,8 +16,9 @@
 
 #define LOG_TAG "audio_hw_primary"
 #define ATRACE_TAG ATRACE_TAG_AUDIO
-/*#define LOG_NDEBUG 0*/
-/*#define VERY_VERY_VERBOSE_LOGGING*/
+#define LOG_NDEBUG 0
+#define LOG_NDDEBUG 0
+#define VERY_VERY_VERBOSE_LOGGING
 #ifdef VERY_VERY_VERBOSE_LOGGING
 #define ALOGVV ALOGV
 #else
@@ -1042,7 +1043,7 @@ int select_devices(struct audio_device *adev,
          * usecase. This is to avoid switching devices for voice call when
          * check_and_route_playback_usecases() is called below.
          */
-        if (voice_is_in_call(adev)) {
+        if (adev->voice.in_call && adev->mode == AUDIO_MODE_IN_CALL) {
             vc_usecase = get_usecase_from_list(adev,
                                                get_voice_usecase_id_from_list(adev));
             if ((vc_usecase != NULL) &&
@@ -2040,7 +2041,7 @@ static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
             out->devices = new_dev;
 
             if (output_drives_call(adev, out)) {
-                if (!voice_is_in_call(adev)) {
+                if (!adev->voice.in_call) {
                     if (adev->mode == AUDIO_MODE_IN_CALL) {
                         adev->current_call_output = out;
                         ret = voice_start_call(adev);
@@ -3301,7 +3302,7 @@ static int adev_set_mode(struct audio_hw_device *dev, audio_mode_t mode)
         ALOGD("%s: mode %d", __func__, (int)mode);
         adev->mode = mode;
         if ((mode == AUDIO_MODE_NORMAL || mode == AUDIO_MODE_IN_COMMUNICATION) &&
-                voice_is_in_call(adev)) {
+                adev->voice.in_call) {
             voice_stop_call(adev);
             adev->current_call_output = NULL;
         }
@@ -3366,7 +3367,7 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
     if (check_input_parameters(config->sample_rate, config->format, channel_count) != 0)
         return -EINVAL;
 
-    if (audio_extn_tfa_98xx_is_supported() && (audio_extn_hfp_is_active(adev) || voice_is_in_call(adev)))
+    if (audio_extn_tfa_98xx_is_supported() && (audio_extn_hfp_is_active(adev) || adev->voice.in_call))
         return -EINVAL;
 
     in = (struct stream_in *)calloc(1, sizeof(struct stream_in));

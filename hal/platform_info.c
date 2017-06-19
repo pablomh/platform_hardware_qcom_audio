@@ -15,6 +15,7 @@
 */
 
 #define LOG_TAG "platform_info"
+#define LOG_NDEBUG 0
 #define LOG_NDDEBUG 0
 
 #include <errno.h>

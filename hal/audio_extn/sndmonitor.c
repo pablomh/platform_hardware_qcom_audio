@@ -15,7 +15,7 @@
  */
 
 #define LOG_TAG "audio_hw_sndmonitor"
-/*#define LOG_NDEBUG 0*/
+#define LOG_NDEBUG 0
 #define LOG_NDDEBUG 0
 
 /* monitor sound card, cpe state
