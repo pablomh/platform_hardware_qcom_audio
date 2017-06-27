@@ -121,6 +121,7 @@ static struct listnode *operator_specific_device_table[SND_DEVICE_MAX];
 typedef void (*acdb_deallocate_t)();
 typedef int  (*acdb_init_v2_cvd_t)(const char *, char *, int);
 typedef void (*acdb_send_audio_cal_t)(int, int);
+typedef void (*acdb_send_audio_cal_v2_t)(int, int, int , int);
 typedef void (*acdb_send_audio_cal_v3_t)(int, int, int , int, int);
 typedef void (*acdb_send_voice_cal_t)(int, int);
 typedef int (*acdb_reload_vocvoltable_t)(int);
@@ -142,6 +143,7 @@ struct platform_data {
     acdb_init_v2_cvd_t         acdb_init;
     acdb_deallocate_t          acdb_deallocate;
     acdb_send_audio_cal_t      acdb_send_audio_cal;
+    acdb_send_audio_cal_v2_t   acdb_send_audio_cal_v2;
     acdb_send_audio_cal_v3_t   acdb_send_audio_cal_v3;
     acdb_send_voice_cal_t      acdb_send_voice_cal;
     acdb_reload_vocvoltable_t  acdb_reload_vocvoltable;
@@ -974,7 +976,13 @@ void *platform_init(struct audio_device *adev)
         my_data->acdb_send_audio_cal_v3 = (acdb_send_audio_cal_t)dlsym(my_data->acdb_handle,
                                                     "acdb_loader_send_audio_cal_v3");
         if (!my_data->acdb_send_audio_cal_v3)
-            ALOGE("%s: Could not find the symbol acdb_send_audio_cal from %s",
+            ALOGE("%s: Could not find the symbol acdb_send_audio_cal_v3 from %s",
+                  __func__, LIB_ACDB_LOADER);
+
+        my_data->acdb_send_audio_cal_v2 = (acdb_send_audio_cal_t)dlsym(my_data->acdb_handle,
+                                                    "acdb_loader_send_audio_cal_v2");
+        if (!my_data->acdb_send_audio_cal_v2)
+            ALOGE("%s: Could not find the symbol acdb_send_audio_cal_v2 from %s",
                   __func__, LIB_ACDB_LOADER);
 
         my_data->acdb_send_audio_cal = (acdb_send_audio_cal_t)dlsym(my_data->acdb_handle,
@@ -1325,6 +1333,26 @@ int platform_send_audio_calibration(void *platform, snd_device_t snd_device)
                                 DEFAULT_APP_TYPE_TX_PATH, sample_rate, BUFF_IDX_1);
             my_data->acdb_send_audio_cal_v3(acdb_dev_id, ACDB_DEV_TYPE_OUT,
                                 DEFAULT_APP_TYPE_RX_PATH, sample_rate, BUFF_IDX_1);
+    } else if ((my_data->acdb_send_audio_cal_v2) &&
+               (snd_device == SND_DEVICE_IN_VOICE_SPEAKER_MIC_HFP) &&
+               !audio_extn_tfa_98xx_is_supported() ) {
+            /* TX path calibration */
+            ALOGV("%s: sending TX audio calibration for snd_device(%d) acdb_id(%d)",
+                       __func__, snd_device, acdb_dev_id);
+            my_data->acdb_send_audio_cal_v2(acdb_dev_id, ACDB_DEV_TYPE_IN,
+                                DEFAULT_APP_TYPE_TX_PATH, sample_rate);
+            my_data->acdb_send_audio_cal_v2(acdb_dev_id, ACDB_DEV_TYPE_OUT,
+                                DEFAULT_APP_TYPE_RX_PATH, sample_rate);
+    } else if ((my_data->acdb_send_audio_cal_v2) &&
+               (snd_device == SND_DEVICE_OUT_VOICE_SPEAKER_HFP) &&
+               !audio_extn_tfa_98xx_is_supported()) {
+            /* RX path calibration */
+            ALOGV("%s: sending RX audio calibration for snd_device(%d) acdb_id(%d)",
+                       __func__, snd_device, acdb_dev_id);
+            my_data->acdb_send_audio_cal_v2(acdb_dev_id, ACDB_DEV_TYPE_IN,
+                                DEFAULT_APP_TYPE_TX_PATH, sample_rate);
+            my_data->acdb_send_audio_cal_v2(acdb_dev_id, ACDB_DEV_TYPE_OUT,
+                                DEFAULT_APP_TYPE_RX_PATH, sample_rate);
     } else if (my_data->acdb_send_audio_cal) {
         my_data->acdb_send_audio_cal(acdb_dev_id, acdb_dev_type);
     }
