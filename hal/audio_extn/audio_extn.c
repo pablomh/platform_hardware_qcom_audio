@@ -15,7 +15,7 @@
  */
 
 #define LOG_TAG "audio_hw_extn"
-/*#define LOG_NDEBUG 0*/
+#define LOG_NDEBUG 0
 #define LOG_NDDEBUG 0
 
 #include <stdlib.h>

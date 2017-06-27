@@ -15,7 +15,8 @@
  */
 
 #define LOG_TAG "tfa_98xx"
-/*#define LOG_NDEBUG 0*/
+#define LOG_NDEBUG 0
+#define LOG_NDDEBUG 0
 #include <cutils/log.h>
 
 #include <stdlib.h>

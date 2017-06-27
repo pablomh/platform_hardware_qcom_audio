@@ -15,7 +15,8 @@
  */
 
 #define LOG_TAG "msm8916_platform"
-/*#define LOG_NDEBUG 0*/
+#define LOG_NDEBUG 0
+#define LOG_NDDEBUG 0
 
 #include <stdlib.h>
 #include <dlfcn.h>
